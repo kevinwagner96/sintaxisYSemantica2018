@@ -18,4 +18,5 @@ int obtenerTran(int posF,int posC,int sizeF,int sizeC, int *tT);
 int esFinal(int estado , int estadosF[], int sizeF);
 
 
-#endif /* automata_h */
+#endif
+// /* automata_h *
