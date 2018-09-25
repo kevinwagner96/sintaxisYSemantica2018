@@ -10,9 +10,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+/*
+char BUFFER [100]={};
+int indexBUFFER = 0;
 
-
-int automata(int *tT, int f, int c,char *lenguaje[],int estFinales[],char cadena[])
+void agregarC (int c){
+	BUFFER[indexBUFFER] = c;
+	indexBUFFER=indexBUFFER+1;
+}
+*/
+/*
+int automata(int *tT, int f, int c,char *lenguaje[],int estFinales[],char cadena[],char **buffer)
 {
     int estado = 0;
     int i;
@@ -25,15 +33,19 @@ int automata(int *tT, int f, int c,char *lenguaje[],int estFinales[],char cadena
         if(estadoNuevo == -1){break;}
         
         estado = estadoNuevo;
+        if(estadoNuevo == 1 || estadoNuevo == 3){
+        	agregarC(cadena[i]);
+		}
     }
     
     if((i)==strlen(cadena) && esFinal(estado,estFinales,f)){
-        return 1;
+    	buffer = &BUFFER[0];
+        return estado;
     }
     
     return 0;
 }
-
+*/
 
 int pertenece (char letra, char *vect){
     char i=0;
@@ -44,6 +56,7 @@ int pertenece (char letra, char *vect){
     }
     return 0;
 }
+
 
 int posEntrada (char caracter , char *lenguaje[] , int size){
     int i = 0;
@@ -63,7 +76,7 @@ int esFinal(int estado , int estadosF[], int sizeF){
     int i = 0;
     for(i ; i < sizeF ; i++){
         if(estado == estadosF[i]){
-            return 1;
+            return estado;
         }
     }
     return 0;

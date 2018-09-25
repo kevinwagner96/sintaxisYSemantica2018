@@ -12,12 +12,17 @@
 #include "automata.h"
 
 char numeros[] = "1234567890";
-char vocales[] = "aeiou";
+char letras[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+char otro[] = "!@#~$%^&_`/.,][?";
+char fdt[] = {'\n'};
+char sp[] = {'\n',' ','\t'};
 char sigPunt[] = "(){};";
 char operadores[] = "+-*=";
 
+char BUFFER [100]={};
+int indexBUFFER = 0;
 
-char *identiC [] = {vocales,numeros}; // en orden
+char *identiC [] = {letras,numeros}; // en orden
 int identiEF [] = {1,2};
 int identiTT [3][2]={{ 1,-1},
     { 1, 2},
@@ -51,6 +56,24 @@ int sigPunt_TT [2][5]= {{ 1, 1, 1, 1, 1},
     {-1,-1,-1,-1,-1}};
 
 
+char *escanner_C[] = {letras,numeros,"+","-","*","=","(",")",";",fdt," ",otro};
+int escanner_EF[] = {2,4,5,6,7,8,9,10,11,12};
+int escanner_TT[14][12] = {{1,3,5,6,7,8,9,10,11,12,0,13},
+						  {1,1,2,2,2,2,2,2,2,2,2,2},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {4,3,4,4,4,4,4,4,4,4,4,4},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13},
+						  {13,13,13,13,13,13,13,13,13,13,13,13}};
+
 int getToken(char cadena[]);
 
 int main(int argc, char *argv[]) {
@@ -61,7 +84,8 @@ int main(int argc, char *argv[]) {
     scanf("%s", cadena );
     
     
-    printf("Pertenece a la categoria %d ",getToken(cadena));
+    //printf("Pertenece a la categoria %d ",getToken(cadena));
+    scanner(cadena);
     
     scanf("%s", cadena );
     
@@ -69,10 +93,43 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void lexemasATokens (char pagina[], char Tokens[]){
-    
+void scanner (char cadena[]){
+	
+    printf("TT = %d",escannerAutomata(&escanner_TT[0][0],14,12,escanner_C,escanner_EF,cadena,&BUFFER))  ;
+    printf("Buffer = %s",BUFFER)  ;
+	     
 }
 
+int escannerAutomata(int *tT, int f, int c,char *lenguaje[],int estFinales[],char cadena[])
+{
+    int estado = 0;
+    int i;
+    for(i=0; cadena[i] ; i++){
+        
+        int columnaE = posEntrada(cadena[i],lenguaje,c);
+        if(columnaE==-1){break;}
+        
+        int estadoNuevo = obtenerTran(estado,columnaE,f,c,tT);
+        if(estadoNuevo == -1){break;}
+        
+        estado = estadoNuevo;
+        if(estadoNuevo == 1 || estadoNuevo == 3){
+        	agregarC(cadena[i]);
+		}
+    }
+    
+    if((i)==strlen(cadena) /*&& esFinal(estado,estFinales,f)*/){
+        return estado;
+    }
+    
+    return 0;
+}
+
+void agregarC (int c){
+	BUFFER[indexBUFFER] = c;
+	indexBUFFER=indexBUFFER+1;
+}
+/*
 int getToken(char cadena[]){
   
     if(automata(&identiTT[0][0],3,2, identiC,identiEF,cadena))
@@ -92,3 +149,4 @@ int getToken(char cadena[]){
     
     return 0;
 }
+*/

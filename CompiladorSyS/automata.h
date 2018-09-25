@@ -12,7 +12,8 @@
 #include <stdio.h>
 
 int pertenece (char letra, char vect []);
-int automata(int *tT, int f, int c,char *lenguaje[],int estFinales[],char cadena[]);
+
+int automata(int *tT, int f, int c,char *lenguaje[],int estFinales[],char cadena[],char *Bf);
 int posEntrada (char caracter , char *lenguaje[] , int size);
 int obtenerTran(int posF,int posC,int sizeF,int sizeC, int *tT);
 int esFinal(int estado , int estadosF[], int sizeF);
