@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     
     printf("Pertenece a la categoria %d ",getToken(cadena));
     
-    
+    scanf("%s", cadena );
     
     
     return 0;
