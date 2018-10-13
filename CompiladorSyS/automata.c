@@ -81,3 +81,5 @@ int esFinal(int estado , int estadosF[], int sizeF){
     }
     return 0;
 }
+
+
