@@ -14,7 +14,7 @@
 
 typedef enum {
 	LLAVE_IZQ,LLAVE_DER,ID,CONSTANTE,PAREN_IZQ,PAREN_DER,PUNTO_Y_COMA,
-	ASIGNACION,SUMA,INT,SHORT,RESTA,MULTIPLICACION,FDT
+	ASIGNACION,SUMA,INT,SHORT,RESTA,MULTIPLICACION,FDT,ERROR_L
 }TOKEN;
 
 TOKEN machScanner(int ESTADO);
@@ -62,6 +62,7 @@ int escanner_TT[16][14] = {{1,3,5,6,7,8,9,10,11,12,13,15,0,14},
 							{14,14,14,14,14,14,14,14,14,14,14,14,14,14}};
 
 
+
 int getToken(char cadena[]);
 void scanner (char cadena[]);
 void almacenarEnTS(char atributo[]);
@@ -70,7 +71,11 @@ void errorLexico();
 TOKEN proximoToken();
 void unGet();
 int INDEX = 0;
+TOKEN TOKEN_ULTIMO;
+int TOKEN_TOMADO=0;
 FILE *archivoTxt;
+
+
 int main(int argc, char *argv[]) {
     
     
@@ -90,13 +95,14 @@ int main(int argc, char *argv[]) {
       return 1;
     }
     
-    while(1){
-    	if(proximoToken()==FDT)
-    		break;
+    Objetivo();
+    /*
+	i = 0;
+	while(i<5){
+		proximoToken();
+		i++;
 	}
-		
-	
-	
+	*/
     mostrarTS();
     
     printf("FINALIZADO");
@@ -158,7 +164,8 @@ TOKEN machScanner(int ESTADO){
       		return CONSTANTE;
       	break;
 		case 14:			
-			errorLexico();
+			//errorLexico();
+			return ERROR_L;
 		break;
 		case 5:
 			printf( " %s ","SUMA");
@@ -184,7 +191,7 @@ TOKEN machScanner(int ESTADO){
 			return LLAVE_DER;
 		break;
 		case 11:
-			printf( " %s ","PUNTO_Y_COMA");
+			printf( " %s ","PUNTO_Y_COMA \n");
 			return PUNTO_Y_COMA;
 		break;
 		case 12:
@@ -211,12 +218,14 @@ TOKEN esReservada(){
 
 	if(equal(&BUFFER[0],&RESERVADA_INT[0])){
 		printf( " %s ","INT");
+		limpiarBuffer();
 		return INT;
 	}
 		
 		
 	if(equal(&BUFFER[0],&RESERVADA_SHORT[0])){
 		printf( " %s ","SHORT");
+		limpiarBuffer();
 		return SHORT;	
 	}
 		
@@ -244,9 +253,7 @@ void agregarC (int c){
 	indexBUFFER=indexBUFFER+1;
 }
 
-void errorLexico(){
-	printf( " %s ","* ERROR_LEXICO");
-}
+
 
 int sizeTS(){
 	int i = 0 ; 
@@ -305,14 +312,10 @@ void mostrarTS(){
 	}
 }
 
-TOKEN proximoToken(){
-	TOKEN token =  escannerAutomata(&escanner_TT[0][0],16,14,escanner_C,escanner_EF);
-    	
-    return token;
-}
+
 
 // PARSER
-/*
+
 void Objetivo(void){
 	Programa();
 	Match(FDT);
@@ -324,10 +327,108 @@ void Programa(void){
 	Match(LLAVE_DER);
 }
 
+void ListaSentencias(void){
+	Linea(); //Primer Linea de sentencia
+	
+	while(1){
+		switch (proximoToken()){
+		case INT:
+		case ID:
+		case SHORT:
+			Linea();
+		break;
+		default:
+			return;					
+		}		 
+	}
+	
+}
+
+void Linea(void){
+	TOKEN token = proximoToken();
+	
+	switch (token){
+		case INT: //INT ID ASIGNACION <Valor>  PUNTOYCOMA
+			Match(INT); Match(ID); Match(ASIGNACION); 	Valor(); Match(PUNTO_Y_COMA);
+			break;
+		case ID:  // ID ASIGNACION  <Valor>  PUNTOYCOMA
+			Match(ID);  Match(ASIGNACION); 	Valor();  Match(PUNTO_Y_COMA);
+			break;
+		case SHORT: // SHORT ID ASIGNACION <Valor>  PUNTOYCOMA
+			Match(SHORT); Match(ID); Match(ASIGNACION); 	Valor(); Match(PUNTO_Y_COMA);
+			break;
+		default:
+			ErrorSintactico(token); 
+		break;
+	}
+}
+
+void Valor (void) {
+	//<Valor> 	-> <Primaria> { <Operador> <Primaria> }
+	TOKEN t;
+	Primaria();	
+	for(t=proximoToken(); t==SUMA||t==RESTA|| t==MULTIPLICACION; t= proximoToken()){
+		Operador();
+		Primaria();
+	}
+}
+
+void Operador(void){
+	// <operador> -> uno de SUMA RESTA MULTIPLICACION
+	TOKEN t = proximoToken();
+	if(t==SUMA||t==RESTA|| t==MULTIPLICACION){
+		Match(t);
+	}else{
+		ErrorSintactico();	
+	}
+}
+
+void Primaria(void){
+	TOKEN t = proximoToken();
+	if(t == ID || t==CONSTANTE){
+		Match(t);
+	}else{
+		ErrorSintactico();
+	}
+}
+
+void ErrorSintactico(TOKEN t){
+	printf( " %s ","* ERROR_SINTACTICO");
+	
+}
+
+void errorLexico(){
+	printf( " %s ","* ERROR_LEXICO");
+
+}
+
+
+TOKEN proximoToken(){
+	if(!TOKEN_TOMADO){
+		TOKEN_ULTIMO =  escannerAutomata(&escanner_TT[0][0],16,14,escanner_C,escanner_EF);
+		if(TOKEN_ULTIMO == ERROR_L){
+			errorLexico();
+			char ch = getchar();
+		} 
+		TOKEN_TOMADO = 1 ;
+	}
+    	
+    return TOKEN_ULTIMO;
+}
+
+void Match(TOKEN token){
+	if ( !(token == proximoToken())){
+		 ErrorSintactico(token);  
+		 char ch = getchar();
+	}
+	
+		 
+	TOKEN_TOMADO = 0;
+}
 
 
 
 
 
-*/
+
 

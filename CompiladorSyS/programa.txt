@@ -1,1 +1,4 @@
-1asafasd123 123 aa 33             
+{int perro = 12;
+peter = 123 + wacho + 1233;
+int perro = 12;
+int perro = 12;}
